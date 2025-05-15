@@ -1,24 +1,28 @@
 import { assert } from 'console';
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import * as THREE from 'three';
 import { Color } from 'three';
 
 // ----------------------------------------------------------------------
-
+type Point = {x:number, y:number, size:number, color:Color}
 export default function Page() {
     const canvas = useRef<HTMLCanvasElement>(null)
     const [webglProgram, setWebglProgram] = useState<WebGLProgram>()
+    const [points, setPoints] = useState<Array<Point>>([])
     const vertexShaderSource = `
         attribute vec4 a_Position;
+        attribute float a_PointSize;
         void main(){
             gl_Position=a_Position;
-            gl_PointSize=100.0;
+            gl_PointSize=a_PointSize;
         }
     `;
     const fragmentShaderSource = `
+        precision mediump float;
+        uniform vec4 u_FragColor;
         void main(){
-            gl_FragColor=vec4(1.0,1.0,0.0,1.0);
+            gl_FragColor=u_FragColor;
         }
     ` 
     const loadShader = (gl: WebGLRenderingContext, type:number, source: string)=>{
@@ -60,10 +64,11 @@ export default function Page() {
 
     useEffect(() => {
         if (canvas && canvas.current) {
+            if(webglProgram) return;
             const { innerWidth, innerHeight } = window;
             canvas.current.width = innerWidth;
             canvas.current.height = innerHeight;
-
+        
             const webgl = canvas.current.getContext('webgl');
             if(webgl){
                 // Set clear color to black, fully opaque
@@ -83,20 +88,46 @@ export default function Page() {
                 initShader(webgl)
             }
         }
-    }, [canvas])
+    }, [canvas, webglProgram])
+
+    const handleClick = (event:any)=>{
+        if (canvas && canvas.current) {
+            const {left, top, width, height} = canvas.current.getBoundingClientRect()
+            const {clientX, clientY} = event;
+            const [cssX, cssY] = [clientX - left, clientY - top]
+            const color = new Color(Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100)
+            const position:Point = {x:cssX/width*2 - 1, y:-cssY/height*2 + 1, size:Math.random()*50.0 + 10, color}
+            //setRectPosition(position)
+            setPoints(arr=>{return [position,...arr]})
+        }
+    }
+
+    const setRectPosition = useCallback((pos:{x:number,y:number})=>{
+        if(!webglProgram||!canvas.current) return;
+        const webgl = canvas.current.getContext('webgl');
+        const a_Position = webgl!.getAttribLocation(webglProgram, 'a_Position')
+        webgl!.vertexAttrib2f(a_Position, pos.x, pos.y);
+        webgl!.drawArrays(webgl!.POINTS, 0, 1)
+    }, [webglProgram, canvas])
 
     useEffect(()=>{
-        if(webglProgram&&canvas.current){
-            const webgl = canvas.current.getContext('webgl');
-            const a_Position = webgl!.getAttribLocation(webglProgram, 'a_Position')
-            webgl!.vertexAttrib3f(a_Position, 1.0, 0.5, 0.0);
+        if(!webglProgram||!canvas.current) return;
+        const webgl = canvas.current.getContext('webgl');
+        const a_Position = webgl!.getAttribLocation(webglProgram, 'a_Position')
+        const a_PointSize = webgl!.getAttribLocation(webglProgram, 'a_PointSize')
+        const u_FragColor = webgl!.getUniformLocation(webglProgram, 'u_FragColor')
+        webgl!.clear(webgl!.COLOR_BUFFER_BIT);
+        points.forEach(point=>{
+            webgl!.vertexAttrib2f(a_Position, point.x, point.y);
+            webgl!.vertexAttrib1f(a_PointSize, point.size);
+            webgl!.uniform4f(u_FragColor, point.color.r, point.color.g, point.color.b,1.0)
             webgl!.drawArrays(webgl!.POINTS, 0, 1)
-        }
-    }, [webglProgram])
+        })
+    },[points])
 
     return (
         <>
-            <canvas ref={canvas} />
+            <canvas ref={canvas} onClick={handleClick}/>
         </>
     );
 }
