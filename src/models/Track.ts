@@ -48,7 +48,7 @@ export class Track{
             }else if(time>fms[last][0]){
                 target[key] = fms[last][1]
             }else{
-                target[key]=getValBetweenFms(time,fms,last)
+                target[key]=this.getValBetweenFms(time,fms,last)
             }
         }
     }
@@ -70,6 +70,7 @@ export class Track{
                 }
                 const k = delta.y/delta.x
                 const b = fm1[1] - fm1[0]*k
+                console.log("between val:", k*time+b)
                 return k*time+b
             }
         }

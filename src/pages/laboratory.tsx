@@ -1,15 +1,20 @@
 import { assert } from 'console';
 import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Compose } from 'src/models/Compose';
+import { Track } from 'src/models/Track';
 import * as THREE from 'three';
 import { Color } from 'three';
 
 // ----------------------------------------------------------------------
-type Point = {x:number, y:number, size:number, color:Color}
+//type RGBA = {r:number,g:number, b:number, opacity:number}
+type Point = {x:number, y:number, size:number, color:Color, opacity:number}
 export default function Page() {
     const canvas = useRef<HTMLCanvasElement>(null)
     const [webglProgram, setWebglProgram] = useState<WebGLProgram>()
     const [points, setPoints] = useState<Array<Point>>([])
+    const [testing, setTesting] = useState<boolean>(false)
+    const compose = useRef<Compose>(new Compose())
     const vertexShaderSource = `
         attribute vec4 a_Position;
         attribute float a_PointSize;
@@ -100,10 +105,25 @@ export default function Page() {
             const {left, top, width, height} = canvas.current.getBoundingClientRect()
             const {clientX, clientY} = event;
             const [cssX, cssY] = [clientX - left, clientY - top]
-            const color = new Color(Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100)
-            const position:Point = {x:cssX/width*2 - 1, y:-cssY/height*2 + 1, size:Math.random()*50.0 + 10, color}
+            const color = new Color(Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100);
+            const position:Point = {x:cssX/width*2 - 1, y:-cssY/height*2 + 1, size:Math.random()*50.0 + 10, color, opacity:1.0}
             //setRectPosition(position)
+            const track = new Track(position);
+            track.start = new Date().getTime()
+            track.timelen = 2000
+            track.loop = true
+            track.keyFrameMap = new Map([
+                ['opacity', [
+                    [500, 1.0],
+                    [1000, 0],
+                    [1500, 1.0]
+                ]]
+            ])
             setPoints(arr=>{return [position,...arr]})
+
+            
+
+            compose.current.add(track)
         }
     }
 
@@ -116,6 +136,14 @@ export default function Page() {
     }, [webglProgram, canvas])
 
     useEffect(()=>{
+        (function ani(){
+            compose.current.update(new Date().getTime())
+            render()
+            requestAnimationFrame(ani)
+        })();
+    },[points])
+
+    const render = ()=>{
         if(!webglProgram||!canvas.current) return;
         const webgl = canvas.current.getContext('webgl');
         const a_Position = webgl!.getAttribLocation(webglProgram, 'a_Position')
@@ -126,12 +154,12 @@ export default function Page() {
             webgl!.vertexAttrib2f(a_Position, point.x, point.y);
             webgl!.vertexAttrib1f(a_PointSize, point.size);
             //webgl!.uniform4f(u_FragColor, point.color.r, point.color.g, point.color.b,1.0)
-            const vector = new Float32Array([point.color.r, point.color.g, point.color.b,1.0])
+            const vector = new Float32Array([point.color.r, point.color.g, point.color.b,point.opacity])
             webgl!.uniform4fv(u_FragColor, vector)
             webgl!.drawArrays(webgl!.POINTS, 0, 1)
         })
-    },[points])
-
+    }
+    
     return (
         <>
             <canvas ref={canvas} onClick={handleClick}/>
