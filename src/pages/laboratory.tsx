@@ -153,13 +153,13 @@ export default function Page() {
         points.forEach(point=>{
             webgl!.vertexAttrib2f(a_Position, point.x, point.y);
             webgl!.vertexAttrib1f(a_PointSize, point.size);
-            //webgl!.uniform4f(u_FragColor, point.color.r, point.color.g, point.color.b,1.0)
+            // webgl!.uniform4f(u_FragColor, point.color.r, point.color.g, point.color.b,1.0)
             const vector = new Float32Array([point.color.r, point.color.g, point.color.b,point.opacity])
             webgl!.uniform4fv(u_FragColor, vector)
             webgl!.drawArrays(webgl!.POINTS, 0, 1)
         })
     }
-    
+
     return (
         <>
             <canvas ref={canvas} onClick={handleClick}/>
