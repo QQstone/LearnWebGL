@@ -18,6 +18,7 @@ export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const LaboratoryPage = lazy(() => import('src/pages/laboratory'))
 export const GraphicPage = lazy(()=>import('src/pages/graphic'))
+export const ThreeJsPage = lazy(()=>import('src/pages/threejs'))
 
 // ----------------------------------------------------------------------
 
@@ -50,7 +51,8 @@ export function Router() {
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'laboratory', element: <LaboratoryPage /> },
-        { path: 'graphic', element: <GraphicPage />}
+        { path: 'graphic', element: <GraphicPage />},
+        { path: 'threeJS', element: <ThreeJsPage />}
       ],
     },
     {

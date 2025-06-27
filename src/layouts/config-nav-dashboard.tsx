@@ -44,6 +44,11 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
+    title: 'Three.js',
+    path: '/threeJS',
+    icon: icon('ic-analytics'),
+  },
+  {
     title: 'Sign in',
     path: '/sign-in',
     icon: icon('ic-lock'),
