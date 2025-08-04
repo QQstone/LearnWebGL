@@ -53,14 +53,8 @@ export default function Page() {
                 }
             }
         }
-
-        const sphereGeometry = new THREE.SphereGeometry(5,12,12)
-        const meterial = new THREE.MeshBasicMaterial({color:'#fff'})
-        const ball = new THREE.Mesh(sphereGeometry, meterial)
-        ball.position.set(0,0,0)
         
         scene.add(group)
-        scene.add(ball)
 
         // // Add OrbitControls
         const controls = new OrbitControls(camera, renderer.domElement)

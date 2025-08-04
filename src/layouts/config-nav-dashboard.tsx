@@ -48,6 +48,11 @@ export const navData = [
     path: '/threeJS',
     icon: icon('ic-analytics'),
   },
+   {
+    title: 'Geometry',
+    path: '/geometry',
+    icon: icon('ic-analytics'),
+  },
   {
     title: 'Sign in',
     path: '/sign-in',
