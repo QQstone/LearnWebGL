@@ -20,6 +20,7 @@ export const LaboratoryPage = lazy(() => import('src/pages/laboratory'))
 export const GraphicPage = lazy(()=>import('src/pages/graphic'))
 export const ThreeJsPage = lazy(()=>import('src/pages/threejs'))
 export const GeometryPage = lazy(()=>import('src/pages/geometry'))
+export const TexturePage = lazy(()=>import('src/pages/texture'))
 
 // ----------------------------------------------------------------------
 
@@ -54,7 +55,8 @@ export function Router() {
         { path: 'laboratory', element: <LaboratoryPage /> },
         { path: 'graphic', element: <GraphicPage />},
         { path: 'threeJS', element: <ThreeJsPage />},
-        { path: 'geometry', element: <GeometryPage />}
+        { path: 'geometry', element: <GeometryPage />},
+        { path: 'texture', element: <TexturePage />}
       ],
     },
     {
