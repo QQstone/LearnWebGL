@@ -35,7 +35,7 @@ export default function Page() {
         container.current.appendChild(renderer.domElement)
         
         const loader = new THREE.TextureLoader()
-        const texture = loader.load('./assets/images/cover/cover-22.webp',
+        const texture = loader.load('./assets/images/texture/cover-22.webp',
             (txt)=>{
                 console.log(txt)
             },
