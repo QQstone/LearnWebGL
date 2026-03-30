@@ -58,14 +58,19 @@ export const navData = [
     path: '/texture',
     icon: icon('ic-analytics'),
   },
+  // {
+  //   title: 'Sign in',
+  //   path: '/sign-in',
+  //   icon: icon('ic-lock'),
+  // },
+  // {
+  //   title: 'Not found',
+  //   path: '/404',
+  //   icon: icon('ic-disabled'),
+  // },
   {
-    title: 'Sign in',
-    path: '/sign-in',
-    icon: icon('ic-lock'),
-  },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic-disabled'),
+    title: 'Shader Basic',
+    path: 'shader-basic',
+    icon: icon('ic-analytics'),
   },
 ];

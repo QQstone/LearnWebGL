@@ -15,6 +15,7 @@ export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
+export const ShaderBasicPage = lazy(() => import('src/pages/shader-basic'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const LaboratoryPage = lazy(() => import('src/pages/laboratory'))
 export const GraphicPage = lazy(()=>import('src/pages/graphic'))
@@ -56,7 +57,8 @@ export function Router() {
         { path: 'graphic', element: <GraphicPage />},
         { path: 'threeJS', element: <ThreeJsPage />},
         { path: 'geometry', element: <GeometryPage />},
-        { path: 'texture', element: <TexturePage />}
+        { path: 'texture', element: <TexturePage />},
+        { path: 'shader-basic', element: <ShaderBasicPage /> },
       ],
     },
     {
