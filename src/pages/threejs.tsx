@@ -1,9 +1,6 @@
-import { assert } from 'console';
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import * as THREE from 'three';
+import { useRef, useEffect } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import gsap from 'gsap'
 
 export default function Page() {
     const container = useRef<HTMLDivElement>(null)
@@ -33,7 +30,7 @@ export default function Page() {
         container.current.appendChild(renderer.domElement)
         
         
-        //const cubeMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe:true})
+        // const cubeMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe:true})
         const matArray = []
         matArray.push(new THREE.MeshBasicMaterial({color: 0xff0000}))
         matArray.push(new THREE.MeshBasicMaterial({color: 0x009e60}))
@@ -80,7 +77,7 @@ export default function Page() {
         //      renderer.render(scene, camera);
         // };
 
-        //animate();
+        // animate();
         // mouse rotate
         document.addEventListener('mousemove', (e)=>{
             if(!container.current) return
@@ -98,8 +95,6 @@ export default function Page() {
     },[])
     
     return (
-        <>
-            <div ref={container} style={{width:"100%", height:"100vh", background:"red"}}></div>
-        </>
+        <div ref={container} style={{width:"100%", height:"100vh", background:"red"}} />
     );
 }

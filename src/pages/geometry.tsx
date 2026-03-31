@@ -1,10 +1,7 @@
-import { assert } from 'console';
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import gsap from 'gsap'
+import { useRef, useEffect } from 'react';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 
 export default function Page() {
@@ -63,18 +60,18 @@ export default function Page() {
                     font,
                     size: 2,
                     depth:0.2,
-                    bevelEnabled: true, /**是否倒角 */
+                    bevelEnabled: true, /** 是否倒角 */
                     bevelThickness: 0.3,
                     bevelSize: 0.2,
                     bevelOffset: 0,
-                    bevelSegments: 5, /**倒角细分数量 */
-                    curveSegments:6 /**曲线细分数量 */
+                    bevelSegments: 5, /** 倒角细分数量 */
+                    curveSegments:6 /** 曲线细分数量 */
                 }
             )
 
             const textMaterial = new THREE.MeshBasicMaterial({ color: 'blue', wireframe:true })
             const textMesh = new THREE.Mesh(textGeometry, textMaterial)
-            //textMesh.position.set(0,0,0)
+            // textMesh.position.set(0,0,0)
             scene.add(textMesh)
         })
 
@@ -101,8 +98,6 @@ export default function Page() {
     }, [])
 
     return (
-        <>
-            <div ref={container} style={{ width: "100%", height: "100vh", background: "red" }}></div>
-        </>
+        <div ref={container} style={{ width: "100%", height: "100vh", background: "red" }} />
     );
 }

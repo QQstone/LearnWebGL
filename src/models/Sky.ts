@@ -1,6 +1,8 @@
 export class Sky {
     webgl
+
     children: Array<Sky>
+
     constructor(webgl:WebGLRenderingContext){
         this.webgl = webgl
         this.children = []

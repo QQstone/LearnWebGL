@@ -1,10 +1,6 @@
-import { assert } from 'console';
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import * as THREE from 'three';
+import { useRef, useEffect } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import gsap from 'gsap'
-import { text } from 'stream/consumers';
 
 
 export default function Page() {
@@ -53,20 +49,20 @@ export default function Page() {
         // THREE.MirroredRepeatWrapping接缝处镜像翻转
         texture.wrapS = THREE.MirroredRepeatWrapping
         texture.wrapT = THREE.MirroredRepeatWrapping
-        //texture.offset.x = 0.5
+        // texture.offset.x = 0.5
         texture.rotation = Math.PI * 0.5
-        //texture.center.x = 1
-        //texture.center.y = 1
-        //texture.generateMipmaps = true
-        //texture.magFilter = THREE.LinearFilter
-        //texture.minFilter = THREE.LinearMipmapLinearFilter
+        // texture.center.x = 1
+        // texture.center.y = 1
+        // texture.generateMipmaps = true
+        // texture.magFilter = THREE.LinearFilter
+        // texture.minFilter = THREE.LinearMipmapLinearFilter
         const cubeMaterial = new THREE.MeshDepthMaterial({
             // color: 0xff0000, 
             // wireframe:true
             map: texture
         })
 
-        //cubeMaterial.transparent = true
+        // cubeMaterial.transparent = true
 
         // const group = new THREE.Mesh();
         const count = 30
@@ -79,7 +75,7 @@ export default function Page() {
             const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
             cube.position.set(x,y,z)
             scene.add(cube)
-            //renderer.render(scene, camera);
+            // renderer.render(scene, camera);
         }
 
         // const sphereGeometry = new THREE.SphereGeometry(5, 32, 32)
@@ -91,7 +87,7 @@ export default function Page() {
 
         // // Add OrbitControls
         const controls = new OrbitControls(camera, renderer.domElement)
-        //controls.target = ball.position
+        // controls.target = ball.position
         controls.target = new THREE.Vector3(0, 0, 0)
         controls.update()
         renderer.render(scene, camera);
@@ -132,8 +128,6 @@ export default function Page() {
     },[])
     
     return (
-        <>
-            <div ref={container} style={{width:"100%", height:"100vh", background:"red"}}></div>
-        </>
+        <div ref={container} style={{width:"100%", height:"100vh", background:"red"}} />
     );
 }

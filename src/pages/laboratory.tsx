@@ -1,13 +1,11 @@
-import { assert } from 'console';
-import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Compose } from 'src/models/Compose';
-import { Track } from 'src/models/Track';
-import * as THREE from 'three';
 import { Color } from 'three';
+import { useRef, useState, useEffect, useCallback } from 'react';
+
+import { Track } from 'src/models/Track';
+import { Compose } from 'src/models/Compose';
 
 // ----------------------------------------------------------------------
-//type RGBA = {r:number,g:number, b:number, opacity:number}
+// type RGBA = {r:number,g:number, b:number, opacity:number}
 type Point = {x:number, y:number, size:number, color:Color, opacity:number}
 export default function Page() {
     const canvas = useRef<HTMLCanvasElement>(null)
@@ -42,7 +40,7 @@ export default function Page() {
         gl.compileShader(shader)
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
             alert(
-           "编译着色器时出错：" + gl.getShaderInfoLog(shader),
+           `编译着色器时出错：${  gl.getShaderInfoLog(shader)}`,
             );
             gl.deleteShader(shader);
             return null;
@@ -61,8 +59,8 @@ export default function Page() {
             gl.linkProgram(program)
             if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
                 alert(
-                  "无法初始化着色器程序: " +
-                 gl.getProgramInfoLog(program),
+                  `无法初始化着色器程序: ${ 
+                 gl.getProgramInfoLog(program)}`,
                 );
                 return null;
               }
@@ -107,7 +105,7 @@ export default function Page() {
             const [cssX, cssY] = [clientX - left, clientY - top]
             const color = new Color(Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100);
             const position:Point = {x:cssX/width*2 - 1, y:-cssY/height*2 + 1, size:Math.random()*50.0 + 10, color, opacity:1.0}
-            //setRectPosition(position)
+            // setRectPosition(position)
             const track = new Track(position);
             track.start = new Date().getTime()
             track.timelen = 2000
@@ -119,7 +117,7 @@ export default function Page() {
                     [1500, 1.0]
                 ]]
             ])
-            setPoints(arr=>{return [position,...arr]})
+            setPoints(arr=>[position,...arr])
 
             
 
@@ -161,8 +159,6 @@ export default function Page() {
     }
 
     return (
-        <>
-            <canvas ref={canvas} onClick={handleClick}/>
-        </>
+        <canvas ref={canvas} onClick={handleClick}/>
     );
 }

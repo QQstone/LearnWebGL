@@ -1,4 +1,3 @@
-import { iconExists } from "@iconify/react"
 
 const defaultAttr = ()=>({
     webgl:null,
@@ -17,23 +16,34 @@ interface PolyPropInterface{
 }
 
 export class Poly {
-    //@ts-ignore
+    // @ts-ignore
     webgl:WebGLRenderingContext
-    //@ts-ignore
+
+    // @ts-ignore
     webglProgram:WebGLProgram
+
     vertices:number[] = []// : Float32Array = new Float32Array()
+
     // 对象化顶点集合
     geoData = []
+
     size = 2
+
     attrName = 'a_Position'
+
     count = 0
+
     types = ['POINTS']
+
     circleDot = false
+
     u_IsPOINTS:any
+
     constructor(props:PolyPropInterface){
        Object.assign(this, defaultAttr, props)
        this.init()
     }
+
     init(){
         // @ts-ignore
         const {attrName, size, webgl} = this
@@ -70,12 +80,13 @@ export class Poly {
     updateCount(){
         this.count = Math.floor(this.vertices.length/this.size)
     }
+
     draw(types=this.types){
         const {webgl,count,circleDot,u_IsPOINTS}=this
         // for (let type of types) {
         //   circleDot&&webgl.uniform1f(u_IsPOINTS, type==='POINTS')
         //   webgl.drawArrays(webgl[type],0,count);
-        //}
+        // }
         
       }
 }

@@ -1,13 +1,11 @@
-import { assert } from 'console';
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import type { Color } from 'three';
+
+import { useRef, useState, useEffect } from 'react';
+
 import { Compose } from 'src/models/Compose';
-import { Track } from 'src/models/Track';
-import * as THREE from 'three';
-import { Color } from 'three';
 
 // ----------------------------------------------------------------------
-//type RGBA = {r:number,g:number, b:number, opacity:number}
+// type RGBA = {r:number,g:number, b:number, opacity:number}
 type Point = {x:number, y:number, size:number, color:Color, opacity:number}
 export default function Page() {
     const canvas = useRef<HTMLCanvasElement>(null)
@@ -43,7 +41,7 @@ export default function Page() {
         gl.compileShader(shader)
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
             alert(
-           "编译着色器时出错：" + gl.getShaderInfoLog(shader),
+           `编译着色器时出错：${  gl.getShaderInfoLog(shader)}`,
             );
             gl.deleteShader(shader);
             return null;
@@ -62,8 +60,8 @@ export default function Page() {
             gl.linkProgram(program)
             if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
                 alert(
-                  "无法初始化着色器程序: " +
-                 gl.getProgramInfoLog(program),
+                  `无法初始化着色器程序: ${ 
+                 gl.getProgramInfoLog(program)}`,
                 );
                 return null;
               }
@@ -130,8 +128,6 @@ export default function Page() {
         webgl.drawArrays(webgl.TRIANGLES, 0, 3)
     }, [webglProgram])
     return (
-        <>
-            <canvas ref={canvas}/>
-        </>
+        <canvas ref={canvas}/>
     );
 }

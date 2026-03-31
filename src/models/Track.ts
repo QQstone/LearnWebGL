@@ -2,9 +2,13 @@ type FrameVal = [number, any]
 export class Track{
     // 将动画效果添加到target对象
     target:any
+
     start:number
+
     timelen:number
+
     loop:boolean
+
     // 关键帧Map
     /** [
      *      [
@@ -23,7 +27,8 @@ export class Track{
      *      ]
      *  ] */ 
     keyFrameMap:Map<string, Array<FrameVal>>
-    //parent:any
+
+    // parent:any
     constructor(target:any){
         this.target = target
         this.start = 0
@@ -31,11 +36,12 @@ export class Track{
         this.loop = false
         this.keyFrameMap = new Map()
     }
+
     update(t:number){
         const {keyFrameMap: keyMap, start, timelen, target, loop} = this
         let time = t - start
         if(loop){
-            time = time % timelen
+            time %= timelen
         }
         // key-fms 是属性和关键帧集合对 如 key="对象属性1" fms=[[时间点0, 属性值01],[时间点1, 属性值11]]
         for(const [key, fms] of keyMap.entries()){

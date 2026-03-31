@@ -1,8 +1,8 @@
 // templates/three-cube-page.tsx
-import React, { useEffect, useRef } from 'react';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GUI } from 'lil-gui';
+import * as THREE from 'three';
+import React, { useRef, useEffect } from 'react';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 /**
  * Shader Basic Page Component
@@ -90,8 +90,6 @@ export default function ShaderBasic() {
   }, []);
 
   return (
-    <>
-      <canvas ref={containerRef} />
-     </>
+    <canvas ref={containerRef} />
   );
 }
