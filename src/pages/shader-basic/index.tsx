@@ -1,8 +1,9 @@
 // templates/three-cube-page.tsx
 import { GUI } from 'lil-gui';
 import * as THREE from 'three';
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
 
 /**
  * Shader Basic Page Component
@@ -23,9 +24,9 @@ export default function ShaderBasic() {
     camera.position.z = 5;
 
     // 创建渲染器
-    if(!containerRef.current) return;
+    if (!containerRef.current) return;
     const canvas = containerRef.current;
-    const renderer = new THREE.WebGLRenderer({canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 
 
     // 创建立方体
@@ -55,6 +56,31 @@ export default function ShaderBasic() {
     cubeFolder.add(cube.rotation, 'x', 0, Math.PI * 2).name('Rotation X');
     cubeFolder.add(cube.rotation, 'y', 0, Math.PI * 2).name('Rotation Y');
     cubeFolder.open();
+
+    // raw shader texture
+
+    const shaderMaterial = new THREE.RawShaderMaterial({
+      vertexShader: `
+        attribute vec4 a_Position;
+        attribute float a_PointSize;
+        void main(){
+            gl_Position=a_Position;
+            gl_PointSize=a_PointSize;
+        }
+    `,
+      fragmentShader: `
+        precision mediump float;
+        uniform vec4 u_FragColor;
+        void main(){
+            float d = distance(gl_PointCoord, vec2(0.5, 0.5));
+            if(d<0.5){
+                gl_FragColor=u_FragColor;
+            }else{
+                discard;
+            }
+        }
+    `
+    })
 
     // 动画循环
     let animationId: number;

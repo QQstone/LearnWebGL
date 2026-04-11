@@ -15,7 +15,7 @@ export class Sky {
 
     updateVertices(){
         this.children.forEach(ele=>{
-            ele.updateVertices
+            ele.updateVertices()
         })
     }
 }

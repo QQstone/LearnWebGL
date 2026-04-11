@@ -73,4 +73,9 @@ export const navData = [
     path: 'shader-basic',
     icon: icon('ic-analytics'),
   },
+  {
+    title: 'Robot',
+    path: 'robot',
+    icon: icon('ic-analytics'),
+  },
 ];

@@ -74,7 +74,8 @@ export class Poly {
     }
 
     updateBuffer(webgl:WebGLRenderingContext){
-
+        // TODO update
+        console.log(this.webgl)
     }
 
     updateCount(){
