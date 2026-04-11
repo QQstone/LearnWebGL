@@ -33,6 +33,7 @@
     "@iconify/react": "^5.0.2",
     "@mui/lab": "^5.0.0-alpha.173",
     "@mui/material": "^5.16.7",
+    "@react-three/fiber": "^8.18.0",
     "apexcharts": "^3.52.0",
     "dayjs": "^1.11.13",
     "gsap": "^3.13.0",
