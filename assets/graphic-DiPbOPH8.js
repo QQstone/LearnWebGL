@@ -1,4 +1,4 @@
-import{r as s,j as m}from"./index-Clx0nIJX.js";function P(){const f=s.useRef(null),[o,g]=s.useState(),l=`
+import{r as s,j as m}from"./index-eDTncNwH.js";function P(){const f=s.useRef(null),[o,g]=s.useState(),l=`
     attribute vec4 a_Position;
     attribute float a_PointSize;
     void main() {
