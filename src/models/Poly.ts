@@ -73,7 +73,7 @@ export class Poly {
         this.updateCount()
     }
 
-    updateBuffer(webgl:WebGLRenderingContext){
+    updateBuffer(_webgl:WebGLRenderingContext){
         // TODO update
         console.log(this.webgl)
     }
@@ -83,7 +83,7 @@ export class Poly {
     }
 
     draw(types=this.types){
-        const {webgl,count,circleDot,u_IsPOINTS}=this
+        console.log(types.length)
         // for (let type of types) {
         //   circleDot&&webgl.uniform1f(u_IsPOINTS, type==='POINTS')
         //   webgl.drawArrays(webgl[type],0,count);

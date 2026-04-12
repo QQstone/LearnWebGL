@@ -1,133 +1,107 @@
-import type { Color } from 'three';
-
 import { useRef, useState, useEffect } from 'react';
 
-import { Compose } from 'src/models/Compose';
-
-// ----------------------------------------------------------------------
-// type RGBA = {r:number,g:number, b:number, opacity:number}
-type Point = {x:number, y:number, size:number, color:Color, opacity:number}
 export default function Page() {
-    const canvas = useRef<HTMLCanvasElement>(null)
-    const [webglProgram, setWebglProgram] = useState<WebGLProgram>()
-    const [points, setPoints] = useState<Array<Point>>([])
-    const [testing, setTesting] = useState<boolean>(false)
-    const compose = useRef<Compose>(new Compose())
-    // step1 创建着色器源文件
-    const vertexShaderSource = `
-        attribute vec4 a_Position;
-        attribute float a_PointSize;
-        void main(){
-            gl_Position=a_Position;
-            gl_PointSize=a_PointSize;
-        }
-    `;
-    const fragmentShaderSource = `
-        precision mediump float;
-        uniform vec4 u_FragColor;
-        void main(){
-            float d = distance(gl_PointCoord, vec2(0.5, 0.5));
-            if(d<0.5){
-                gl_FragColor=u_FragColor;
-            }else{
-                discard;
-            }
-        }
-    ` 
-    const loadShader = (gl: WebGLRenderingContext, type:number, source: string)=>{
-        const shader = gl.createShader(type)
-        if(!shader) return null
-        gl.shaderSource(shader, source)
-        gl.compileShader(shader)
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            alert(
-           `编译着色器时出错：${  gl.getShaderInfoLog(shader)}`,
-            );
-            gl.deleteShader(shader);
-            return null;
-          }
-        return shader
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [webglProgram, setWebglProgram] = useState<WebGLProgram>();
+
+  const vertexShaderSource = `
+    attribute vec4 a_Position;
+    attribute float a_PointSize;
+    void main() {
+      gl_Position = a_Position;
+      gl_PointSize = a_PointSize;
     }
-    
-    const initShader = (gl: WebGLRenderingContext )=>{
-        const program = gl.createProgram();
-        if(program){
-            const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
-            const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)
-            
-            gl.attachShader(program, vertexShader!)
-            gl.attachShader(program, fragmentShader!)
-            gl.linkProgram(program)
-            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-                alert(
-                  `无法初始化着色器程序: ${ 
-                 gl.getProgramInfoLog(program)}`,
-                );
-                return null;
-              }
-            gl.useProgram(program)
-            setWebglProgram(program)
-        }
-        
+  `;
+
+  const fragmentShaderSource = `
+    precision mediump float;
+    uniform vec4 u_FragColor;
+    void main() {
+      float d = distance(gl_PointCoord, vec2(0.5, 0.5));
+      if (d < 0.5) {
+        gl_FragColor = u_FragColor;
+      } else {
+        discard;
+      }
+    }
+  `;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    if (!canvas || webglProgram) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const webgl = canvas.getContext('webgl');
+    if (!webgl) return;
+
+    const loadShader = (type: number, source: string) => {
+      const shader = webgl.createShader(type);
+      if (!shader) return null;
+
+      webgl.shaderSource(shader, source);
+      webgl.compileShader(shader);
+      if (!webgl.getShaderParameter(shader, webgl.COMPILE_STATUS)) {
+        alert(`Shader compile failed: ${webgl.getShaderInfoLog(shader)}`);
+        webgl.deleteShader(shader);
+        return null;
+      }
+
+      return shader;
+    };
+
+    const program = webgl.createProgram();
+    if (!program) return;
+
+    const vertexShader = loadShader(webgl.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShader = loadShader(webgl.FRAGMENT_SHADER, fragmentShaderSource);
+    if (!vertexShader || !fragmentShader) return;
+
+    webgl.attachShader(program, vertexShader);
+    webgl.attachShader(program, fragmentShader);
+    webgl.linkProgram(program);
+
+    if (!webgl.getProgramParameter(program, webgl.LINK_STATUS)) {
+      alert(`Program link failed: ${webgl.getProgramInfoLog(program)}`);
+      return;
     }
 
-    useEffect(() => {
-        if (canvas && canvas.current) {
-            if(webglProgram) return;
-            const { innerWidth, innerHeight } = window;
-            canvas.current.width = innerWidth;
-            canvas.current.height = innerHeight;
-            
-            
-            const webgl = canvas.current.getContext('webgl')
-            if (!webgl) return
-            // step3 初始化着色器
-            initShader(webgl)
-            
-        }
-    }, [canvas])
-    // step2 获取webgl context
-    // const webgl = useMemo(()=>{
-    //     if (canvas && canvas.current) {
-    //         return canvas.current.getContext('webgl')
-    //     }else{
-    //         return null
-    //     }
-    // }, [canvas])
+    webgl.useProgram(program);
+    setWebglProgram(program);
+  }, [webglProgram, vertexShaderSource, fragmentShaderSource]);
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
 
+    if (!canvas || !webglProgram) return;
 
-    useEffect(()=>{
-        const webgl = canvas!.current!.getContext('webgl')
-        if(!webgl || !webglProgram) return
-        // assert(webgl != null) useless
-        // step4 设置多点坐标
-        const a_Position = webgl!.getAttribLocation(webglProgram, 'a_Position')
-        const a_PointSize = webgl!.getAttribLocation(webglProgram, 'a_PointSize')
-        const u_FragColor = webgl!.getUniformLocation(webglProgram, 'u_FragColor')
+    const webgl = canvas.getContext('webgl');
+    if (!webgl) return;
 
-        const vertices = new Float32Array([
-            0.0, 0.1,
-            -0.1, -0.1,
-            0.1, -0.1,
-            -0.1, 0.2
-        ])
-        // create  buffer
-        const vertexBuffer = webgl!.createBuffer()
-        // bind buffer to webgl
-        webgl.bindBuffer(webgl.ARRAY_BUFFER, vertexBuffer)
-        webgl.bufferData(webgl.ARRAY_BUFFER, vertices, webgl.STATIC_DRAW)
-        // vertexAttribPointer(index, size, type, normalized, stride, offset)
-        webgl.vertexAttribPointer(a_Position, 2, webgl.FLOAT, false, 0, 0)
-        webgl.enableVertexAttribArray(a_Position)
-        webgl.vertexAttrib1f(a_PointSize, 50);
-        // step5 clear
-        webgl.clearColor(0.0, 0.0, 0.0, 1.0)
-        webgl.clear(webgl.COLOR_BUFFER_BIT)
-        // step6 draw array
-        webgl.drawArrays(webgl.TRIANGLES, 0, 3)
-    }, [webglProgram])
-    return (
-        <canvas ref={canvas}/>
-    );
+    const positionLocation = webgl.getAttribLocation(webglProgram, 'a_Position');
+    const pointSizeLocation = webgl.getAttribLocation(webglProgram, 'a_PointSize');
+
+    const vertices = new Float32Array([
+      0.0, 0.1,
+      -0.1, -0.1,
+      0.1, -0.1,
+      -0.1, 0.2,
+    ]);
+
+    const vertexBuffer = webgl.createBuffer();
+    if (!vertexBuffer) return;
+
+    webgl.bindBuffer(webgl.ARRAY_BUFFER, vertexBuffer);
+    webgl.bufferData(webgl.ARRAY_BUFFER, vertices, webgl.STATIC_DRAW);
+    webgl.vertexAttribPointer(positionLocation, 2, webgl.FLOAT, false, 0, 0);
+    webgl.enableVertexAttribArray(positionLocation);
+    webgl.vertexAttrib1f(pointSizeLocation, 50);
+    webgl.clearColor(0.0, 0.0, 0.0, 1.0);
+    webgl.clear(webgl.COLOR_BUFFER_BIT);
+    webgl.drawArrays(webgl.TRIANGLES, 0, 3);
+  }, [webglProgram]);
+
+  return <canvas ref={canvasRef} />;
 }

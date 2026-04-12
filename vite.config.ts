@@ -9,6 +9,7 @@ import glsl from 'vite-plugin-glsl';
 const PORT = 3039;
 
 export default defineConfig({
+  base: '/LearnWebGL/', 
   plugins: [
     react(),
     checker({

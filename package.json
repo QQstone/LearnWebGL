@@ -17,7 +17,8 @@
     "re:start": "yarn rm:all && yarn install && yarn dev",
     "re:build": "yarn rm:all && yarn install && yarn build",
     "re:build-npm": "npm run rm:all && npm install && npm run build",
-    "dev:host": "vite --host"
+    "dev:host": "vite --host",
+    "deploy": "gh-pages -d dist"
   },
   "engines": {
     "node": "20.x"
@@ -33,7 +34,6 @@
     "@iconify/react": "^5.0.2",
     "@mui/lab": "^5.0.0-alpha.173",
     "@mui/material": "^5.16.7",
-    "@react-three/fiber": "^8.18.0",
     "apexcharts": "^3.52.0",
     "dayjs": "^1.11.13",
     "gsap": "^3.13.0",
@@ -69,6 +69,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-unused-imports": "^3.2.0",
     "fs": "^0.0.1-security",
+    "gh-pages": "^6.3.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "vite": "^5.4.2",

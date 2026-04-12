@@ -1,164 +1,166 @@
 import { Color } from 'three';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import { Track } from 'src/models/Track';
 import { Compose } from 'src/models/Compose';
 
-// ----------------------------------------------------------------------
-// type RGBA = {r:number,g:number, b:number, opacity:number}
-type Point = {x:number, y:number, size:number, color:Color, opacity:number}
+type Point = {
+  x: number;
+  y: number;
+  size: number;
+  color: Color;
+  opacity: number;
+};
+
 export default function Page() {
-    const canvas = useRef<HTMLCanvasElement>(null)
-    const [webglProgram, setWebglProgram] = useState<WebGLProgram>()
-    const [points, setPoints] = useState<Array<Point>>([])
-    const [testing, setTesting] = useState<boolean>(false)
-    const compose = useRef<Compose>(new Compose())
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const composeRef = useRef(new Compose());
+  const animationRef = useRef<number>();
+  const pointsRef = useRef<Point[]>([]);
+  const [points, setPoints] = useState<Point[]>([]);
+  const [webglProgram, setWebglProgram] = useState<WebGLProgram>();
+
+  useEffect(() => {
+    pointsRef.current = points;
+  }, [points]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    if (!canvas || webglProgram) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const webgl = canvas.getContext('webgl');
+    if (!webgl) return;
+
     const vertexShaderSource = `
-        attribute vec4 a_Position;
-        attribute float a_PointSize;
-        void main(){
-            gl_Position=a_Position;
-            gl_PointSize=a_PointSize;
-        }
+      attribute vec4 a_Position;
+      attribute float a_PointSize;
+      void main() {
+        gl_Position = a_Position;
+        gl_PointSize = a_PointSize;
+      }
     `;
     const fragmentShaderSource = `
-        precision mediump float;
-        uniform vec4 u_FragColor;
-        void main(){
-            float d = distance(gl_PointCoord, vec2(0.5, 0.5));
-            if(d<0.5){
-                gl_FragColor=u_FragColor;
-            }else{
-                discard;
-            }
+      precision mediump float;
+      uniform vec4 u_FragColor;
+      void main() {
+        float d = distance(gl_PointCoord, vec2(0.5, 0.5));
+        if (d < 0.5) {
+          gl_FragColor = u_FragColor;
+        } else {
+          discard;
         }
-    ` 
-    const loadShader = (gl: WebGLRenderingContext, type:number, source: string)=>{
-        const shader = gl.createShader(type)
-        if(!shader) return null
-        gl.shaderSource(shader, source)
-        gl.compileShader(shader)
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            alert(
-           `编译着色器时出错：${  gl.getShaderInfoLog(shader)}`,
-            );
-            gl.deleteShader(shader);
-            return null;
-          }
-        return shader
-    }
-    
-    const initShader = (gl: WebGLRenderingContext )=>{
-        const program = gl.createProgram();
-        if(program){
-            const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
-            const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)
-            
-            gl.attachShader(program, vertexShader!)
-            gl.attachShader(program, fragmentShader!)
-            gl.linkProgram(program)
-            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-                alert(
-                  `无法初始化着色器程序: ${ 
-                 gl.getProgramInfoLog(program)}`,
-                );
-                return null;
-              }
-            gl.useProgram(program)
-            setWebglProgram(program)
-        }
-        
+      }
+    `;
+
+    const loadShader = (type: number, source: string) => {
+      const shader = webgl.createShader(type);
+      if (!shader) return null;
+
+      webgl.shaderSource(shader, source);
+      webgl.compileShader(shader);
+      if (!webgl.getShaderParameter(shader, webgl.COMPILE_STATUS)) {
+        alert(`Shader compile failed: ${webgl.getShaderInfoLog(shader)}`);
+        webgl.deleteShader(shader);
+        return null;
+      }
+
+      return shader;
+    };
+
+    const program = webgl.createProgram();
+    if (!program) return;
+
+    const vertexShader = loadShader(webgl.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShader = loadShader(webgl.FRAGMENT_SHADER, fragmentShaderSource);
+    if (!vertexShader || !fragmentShader) return;
+
+    webgl.attachShader(program, vertexShader);
+    webgl.attachShader(program, fragmentShader);
+    webgl.linkProgram(program);
+
+    if (!webgl.getProgramParameter(program, webgl.LINK_STATUS)) {
+      alert(`Program link failed: ${webgl.getProgramInfoLog(program)}`);
+      return;
     }
 
-    useEffect(() => {
-        if (canvas && canvas.current) {
-            if(webglProgram) return;
-            const { innerWidth, innerHeight } = window;
-            canvas.current.width = innerWidth;
-            canvas.current.height = innerHeight;
-        
-            const webgl = canvas.current.getContext('webgl');
-            if(webgl){
-                // Set clear color to black, fully opaque
-                webgl.clearColor(0.3, 0.5, 0.3, 1.0);
-                // Clear the color buffer with specified clear color
-                webgl.clear(webgl.COLOR_BUFFER_BIT);
+    webgl.useProgram(program);
+    webgl.clearColor(0.0, 0.0, 0.0, 1.0);
+    webgl.clear(webgl.COLOR_BUFFER_BIT);
+    setWebglProgram(program);
+  }, [webglProgram]);
 
-                const color = new Color("rgba(0,0,0,1)");
+  useEffect(() => {
+    if (!webglProgram || !canvasRef.current) return undefined;
 
-                // (function ani(){
-                //     color.offsetHSL(0.005,0,0);
-                     webgl.clearColor(color.r, color.g, color.b, 1);
-                     webgl.clear(webgl.COLOR_BUFFER_BIT);
-                //     requestAnimationFrame(ani);
-                // })()
+    const canvas = canvasRef.current;
+    const webgl = canvas.getContext('webgl');
+    if (!webgl) return undefined;
 
-                initShader(webgl)
-            }
-        }
-    }, [canvas, webglProgram])
+    const positionLocation = webgl.getAttribLocation(webglProgram, 'a_Position');
+    const pointSizeLocation = webgl.getAttribLocation(webglProgram, 'a_PointSize');
+    const colorLocation = webgl.getUniformLocation(webglProgram, 'u_FragColor');
 
-    const handleClick = (event:any)=>{
-        if (canvas && canvas.current) {
-            const {left, top, width, height} = canvas.current.getBoundingClientRect()
-            const {clientX, clientY} = event;
-            const [cssX, cssY] = [clientX - left, clientY - top]
-            const color = new Color(Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100,Math.floor(Math.random()*100)/100);
-            const position:Point = {x:cssX/width*2 - 1, y:-cssY/height*2 + 1, size:Math.random()*50.0 + 10, color, opacity:1.0}
-            // setRectPosition(position)
-            const track = new Track(position);
-            track.start = new Date().getTime()
-            track.timelen = 2000
-            track.loop = true
-            track.keyFrameMap = new Map([
-                ['opacity', [
-                    [500, 1.0],
-                    [1000, 0],
-                    [1500, 1.0]
-                ]]
-            ])
-            setPoints(arr=>[position,...arr])
+    const render = () => {
+      webgl.clear(webgl.COLOR_BUFFER_BIT);
+      pointsRef.current.forEach((point) => {
+        webgl.vertexAttrib2f(positionLocation, point.x, point.y);
+        webgl.vertexAttrib1f(pointSizeLocation, point.size);
+        webgl.uniform4fv(
+          colorLocation,
+          new Float32Array([point.color.r, point.color.g, point.color.b, point.opacity])
+        );
+        webgl.drawArrays(webgl.POINTS, 0, 1);
+      });
+    };
 
-            
+    const animate = () => {
+      composeRef.current.update(Date.now());
+      render();
+      animationRef.current = window.requestAnimationFrame(animate);
+    };
 
-            compose.current.add(track)
-        }
-    }
+    animate();
 
-    const setRectPosition = useCallback((pos:{x:number,y:number})=>{
-        if(!webglProgram||!canvas.current) return;
-        const webgl = canvas.current.getContext('webgl');
-        const a_Position = webgl!.getAttribLocation(webglProgram, 'a_Position')
-        webgl!.vertexAttrib2f(a_Position, pos.x, pos.y);
-        webgl!.drawArrays(webgl!.POINTS, 0, 1)
-    }, [webglProgram, canvas])
+    return () => {
+      if (animationRef.current) {
+        window.cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [webglProgram]);
 
-    useEffect(()=>{
-        (function ani(){
-            compose.current.update(new Date().getTime())
-            render()
-            requestAnimationFrame(ani)
-        })();
-    },[points])
+  const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const render = ()=>{
-        if(!webglProgram||!canvas.current) return;
-        const webgl = canvas.current.getContext('webgl');
-        const a_Position = webgl!.getAttribLocation(webglProgram, 'a_Position')
-        const a_PointSize = webgl!.getAttribLocation(webglProgram, 'a_PointSize')
-        const u_FragColor = webgl!.getUniformLocation(webglProgram, 'u_FragColor')
-        webgl!.clear(webgl!.COLOR_BUFFER_BIT);
-        points.forEach(point=>{
-            webgl!.vertexAttrib2f(a_Position, point.x, point.y);
-            webgl!.vertexAttrib1f(a_PointSize, point.size);
-            // webgl!.uniform4f(u_FragColor, point.color.r, point.color.g, point.color.b,1.0)
-            const vector = new Float32Array([point.color.r, point.color.g, point.color.b,point.opacity])
-            webgl!.uniform4fv(u_FragColor, vector)
-            webgl!.drawArrays(webgl!.POINTS, 0, 1)
-        })
-    }
+    const {
+      left, top, width, height,
+    } = canvas.getBoundingClientRect();
+    const cssX = event.clientX - left;
+    const cssY = event.clientY - top;
+    const color = new Color(Math.random(), Math.random(), Math.random());
+    const point: Point = {
+      x: (cssX / width) * 2 - 1,
+      y: (-cssY / height) * 2 + 1,
+      size: Math.random() * 50 + 10,
+      color,
+      opacity: 1,
+    };
 
-    return (
-        <canvas ref={canvas} onClick={handleClick}/>
-    );
+    const track = new Track(point);
+    track.start = Date.now();
+    track.timelen = 2000;
+    track.loop = true;
+    track.keyFrameMap = new Map([
+      ['opacity', [[500, 1], [1000, 0], [1500, 1]]],
+    ]);
+
+    composeRef.current.add(track);
+    setPoints((current) => [point, ...current]);
+  };
+
+  return <canvas ref={canvasRef} onClick={handleClick} />;
 }
