@@ -5,6 +5,20 @@
     <link rel="icon" href="/LearnWebGL/favicon.ico" />
     <meta name="theme-color" content="#000000" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript">
+      (function () {
+        const redirect = window.location.search.match(/[?&]p=([^&]+)/);
+
+        if (!redirect) {
+          return;
+        }
+
+        const target = decodeURIComponent(redirect[1]).replace(/~and~/g, '&');
+        const newUrl = window.location.origin + target + window.location.hash;
+
+        window.history.replaceState(null, '', newUrl);
+      })();
+    </script>
     <title>Minimal UI Kit</title>
     <script type="module" crossorigin src="/LearnWebGL/assets/index-hNCDGm2d.js"></script>
     <link rel="stylesheet" crossorigin href="/LearnWebGL/assets/index-BiAigQP_.css">
